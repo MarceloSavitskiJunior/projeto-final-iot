@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <title>Gerenciador IoT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename="css/bootstrap.min.css")}}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="col-md-12 fundo" align="center">
+        <div class="d-flex justify-content-center">
+            <h1>Lixeiro da Sala de Reuniões!</h1>
+        </div>
+        <p>Sala de Reuniões</p>
+    </div>
+    <div class="w-100 p-3">
+        <h2>Controles</h2>
+        <a class="btn" href="/lixeira/fechar" role="button">Fechar lixeira</a>
+        <a class="btn btn-primary" href="/lixeira/abrir" role="button">Abrir lixeira</a>
+
+        <h2>Status da Lixeira</h2>
+        <p>Ocupação</p>
+        <div class="progress">
+            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
+    </div>
+
+    <script>
+        function fetchOcupacao() {
+            $.ajax({
+                url: "/get_occupancy",
+                type: "GET",
+                success: function(data) {
+                    var ocupacao = data.ocupacao;
+                    if (ocupacao !== undefined) {
+                        var progressBar = $('#progress-bar');
+                        
+                        progressBar.css('width', ocupacao + '%');
+                        progressBar.attr('aria-valuenow', ocupacao);
+                        progressBar.text('Ocupação ' + ocupacao.toFixed(2) + '%');
+                    }
+                },
+                error: function() {
+                    console.log("Erro ao buscar dados do Flask.");
+                }
+            });
+        }
+
+        setInterval(fetchOcupacao, 10000);
+        fetchOcupacao();
+    </script>
+</body>
+</html>
